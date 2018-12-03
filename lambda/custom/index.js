@@ -1,10 +1,25 @@
 'use strict';
-
+/*
+Write if statement where if "back to checkpoint" is said, it'll play a rewind sound effect
+*/
 const Alexa = require('alexa-sdk');
 const story = 'Environment Hero.html';
-const TableName = null // story.replace('.html','').replace(/\s/g, "-");
+const TableName = 'EnvironmentHero' // story.replace('.html','').replace(/\s/g, "-");
 var $twine = null;
 const linksRegex = /\[\[([^\|\]]*)\|?([^\]]*)\]\]/g;
+var items = [
+  "Children contribute to only 10% of the world’s pollution but are prone to 40% of global disease.",
+  "In the great Smog Disaster, that happened in London in the year 1952, approximately four thousand people died in a few days due to the high concentrations of pollution.",
+  "5000 people die every day as a result of drinking unclean water.",
+  "People who live in high-density air pollution area, have 20% higher risk of dying from lung cancer, than people living in less polluted areas.",
+  "United States produces 30% of the world’s waste and uses 25 % of the worlds natural resources",
+  "Children contribute to only 10% of the world’s pollution but are prone to 40% of global disease.",
+  "Almost 80% of urban waste in India is dumped in the river Ganges.",
+  "There are more around 73 various kinds of pesticides in the groundwater, which is used as drinking water.",
+  "House owners use chemicals that are 10 times more toxic per acre, than the amount used by the farmers.",
+  "In India, the Ganges water is gradually becoming septic, especially due to dumping of half burnt dead bodies and enshrouded babies."
+]
+var DidYouKnow = items[Math.floor(Math.random()*items.length)];
 
 module.exports.handler = (event, context, callback) => {
   console.log(`handler: ${JSON.stringify(event.request)}`);
@@ -25,8 +40,8 @@ module.exports.handler = (event, context, callback) => {
   const alexa = Alexa.handler(event, context);
   // APP_ID is your skill id which can be found in the Amazon developer console
   // where you create the skill. Optionally set as a Lamba environment variable.
-  alexa.appId = process.env.APP_ID;
-  alexa.dynamoDBTableName = TableName;
+  process.env.APP_ID = alexa.appId;
+  alexa.dynamoDBTableName = "EnvironmentHero";
   alexa.registerHandlers(handlers);
   alexa.execute();
 };
@@ -34,10 +49,10 @@ module.exports.handler = (event, context, callback) => {
 const handlers = {
   'LaunchRequest': function() {
     console.log(`LaunchRequest`);
-    if (this.event.session.attributes['room'] !== undefined) {
+    if (this.event.session.attributes["room"] !== undefined) {
       var room = currentRoom(this.event);
-      var speechOutput = `Hello, you were playing before and got to the room called ${room['$']['name']}. Would you like to resume? `;
-      var reprompt = `Say, resume game, or, new game.`;
+      var speechOutput = `<audio src='https://s3.amazonaws.com/ask-soundlibrary/ui/gameshow/amzn_ui_sfx_gameshow_tally_positive_01.mp3'/> Hello. Great to see you back! Did you know that ` + DidYouKnow + ` . Just a statistic to keep in mind while you venture in the real world. Last time you got to the spot called ${room['$']['name']}. Would you like to resume?`;
+      var reprompt = ` Say, resume game to get back to the action!`;
       speechOutput = speechOutput + reprompt;
       var cardTitle = `Restart`;
       var cardContent = speechOutput;
@@ -46,8 +61,8 @@ const handlers = {
         "speak": speechOutput,
         "listen": reprompt,
         "card" : {
-          "title": cardTitle,
-          "content": cardContent,
+          "title": cardTitle.replace(/<audio [\s\S]*\/>/g, '' ),
+          "content": cardContent.replace(/<audio [\s\S]*\/>/g, '' ),
           "imageObj": imageObj
         }
       })}`);
@@ -72,10 +87,10 @@ const handlers = {
   },
   'WhereAmI': function() {
     var speechOutput = "";
-    if (this.event.session.attributes['room'] === undefined) {
+    if (Object.keys(this.attributes).length === 0) {
       // you just started so you are in the first room
       this.event.session.attributes['room'] = $twine[0]['$']['pid'];
-      speechOutput = `Welcome to ${story.replace('.html','')}. Lets start your game. `;
+      speechOutput = `<audio src='https://s3.amazonaws.com/ask-soundlibrary/nature/amzn_sfx_strong_wind_whistling_01.mp3'/> Welcome to ${story.replace('.html','')},the story of an envrionmentally friendly lifetime! Stories will be told to you and you will have to make the right decisions. For the best experience, play with your eyes closed and let your mind do the rest! Without further ado, lets start your game. `;
     }
 
     var room = currentRoom(this.event);
@@ -104,7 +119,7 @@ const handlers = {
       }
       if (reprompt === "") {
         if (!m[1].toLowerCase().startsWith('if you')) {
-          reprompt = "You can";
+          reprompt = "Do you";
         }
       } else {
         reprompt = `${reprompt} or`;
@@ -174,7 +189,7 @@ const handlers = {
     this.emit('WhereAmI');
   },
   'AMAZON.HelpIntent': function() {
-    var speechOutput = 'This is the Sample Gamebook Skill. ';
+    var speechOutput = 'This is Environment Hero. ';
     var reprompt = 'Say where am I, to hear me speak.';
     speechOutput = speechOutput + reprompt;
     var cardTitle = 'Help.';
@@ -195,16 +210,18 @@ const handlers = {
     this.emit(':responseReady');
   },
   'AMAZON.CancelIntent': function() {
+    this.emit(':saveState', true)
     this.emit('CompletelyExit');
   },
   'AMAZON.StopIntent': function() {
+    this.emit(':saveState', true)
     this.emit('CompletelyExit');
   },
   'CompletelyExit': function() {
-    var speechOutput = 'Goodbye.';
     if (TableName) {
       speechOutput = `Your progress has been saved. ${speechOutput}`;
     }
+    var speechOutput = 'Thanks for spending your precious time to become a better you. Please consider leaving a review on the app store: it means a lot!';
     var cardTitle = 'Exit.';
     var cardContent = speechOutput;
     var imageObj = undefined;
@@ -234,6 +251,7 @@ const handlers = {
   'SessionEndedRequest': function() {
     // "exit", timeout or error. Cannot send back a response
     console.log(`Session ended: ${this.event.request.reason}`);
+    this.emit(':saveState', true);
   },
 };
 
