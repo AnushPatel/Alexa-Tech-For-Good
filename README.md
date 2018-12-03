@@ -6,8 +6,6 @@ Stuck in a polluted earth, it is your mission to find a way out. Journey through
 Made for the Alexa Tech For Good Competition 2018 hosted by DevPost. By Md Raiyan bin Sayeed and Anush Patel!
 
 
-Be sure to take a look at the [Additional Resources](#additional-resources) at the bottom of this page!
-
 
 ## About
 **Note:** The rest of this readme assumes you have your developer environment ready to go and that you have some familiarity with CLI (Command Line Interface) Tools, [AWS](https://aws.amazon.com/), and the [ASK Developer Portal](https://developer.amazon.com/alexa-skills-kit). If not, [click here](./instructions/0-intro.md) for a more detailed walkthrough.
