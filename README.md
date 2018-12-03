@@ -13,7 +13,7 @@ Made for the Alexa Tech For Good Competition 2018 hosted by DevPost. By Md Raiya
 ### Usage
 
 ```text
-Alexa, ask Enivoornment Hero where am I?
+Alexa, ask Environment Hero where am I?
 	>> You are in the main hall of a large castle. Heavy tapestries hang from the walls...
 ```
 ```text
