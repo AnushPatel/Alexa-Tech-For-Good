@@ -1,7 +1,7 @@
 'use strict';
 
 const Alexa = require('alexa-sdk');
-const story = 'environment hero.html';
+const story = 'Environment Hero.html';
 const TableName = null // story.replace('.html','').replace(/\s/g, "-");
 var $twine = null;
 const linksRegex = /\[\[([^\|\]]*)\|?([^\]]*)\]\]/g;
