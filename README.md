@@ -13,11 +13,11 @@ Made for the Alexa Tech For Good Competition 2018 hosted by DevPost. By Md Raiya
 ### Usage
 
 ```text
-Alexa, ask Text Adventure where am I?
+Alexa, ask Enivoornment Hero where am I?
 	>> You are in the main hall of a large castle. Heavy tapestries hang from the walls...
 ```
 ```text
-Alexa, start Text Adventure
+Alexa, start Environment Hero
 	>> You're in a small office, there is a door to your left...
 ```
 
